@@ -29,5 +29,6 @@
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
-  }
+  },
+  "packageManager": "pnpm@10.30.3"
 }
