@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { findFiles, toRelative } from '../../utils/glob.js';
-import type { ArchConfig, RequireErrorHierarchyOptions, Violation } from '../../types.js';
+import { findFiles, matchesAny, toRelative } from '../../utils/glob.js';
+import type { ArchConfig, BaseRuleOptions, RequireErrorHierarchyOptions, Violation } from '../../types.js';
 
 function importsFromRelative(content: string): boolean {
   return /from\s+['"]\./m.test(content);
@@ -9,20 +9,21 @@ function importsFromRelative(content: string): boolean {
 
 export async function errorsExtendAgError(
   config: ArchConfig,
-  options: RequireErrorHierarchyOptions
+  options: BaseRuleOptions
 ): Promise<Violation[]> {
+  const opts = options as RequireErrorHierarchyOptions;
   const absErrorsDir = path.resolve(config.root, 'errors');
   if (!fs.existsSync(absErrorsDir)) return [];
 
   const allFiles = await findFiles(
     path.posix.join(absErrorsDir.replace(/\\/g, '/'), '**/*.ts')
   );
-  const nonIndexFiles = allFiles.filter(f => !f.endsWith('index.ts'));
+  const nonIndexFiles = allFiles.map(toRelative).filter(f => !f.endsWith('index.ts'));
 
   let rootFile: string;
 
-  if (options.rootErrorClass) {
-    rootFile = toRelative(path.join(absErrorsDir, options.rootErrorClass));
+  if (opts.rootErrorClass) {
+    rootFile = toRelative(path.join(absErrorsDir, opts.rootErrorClass));
   } else {
     const candidates = nonIndexFiles.filter(f => {
       const content = fs.readFileSync(f, 'utf8');
@@ -41,6 +42,8 @@ export async function errorsExtendAgError(
     }
     rootFile = candidates[0];
   }
+
+  if (matchesAny(rootFile, opts.except ?? [])) return [];
 
   const content = fs.readFileSync(rootFile, 'utf8');
   if (!content.includes('@australiangreens/ag-error')) {

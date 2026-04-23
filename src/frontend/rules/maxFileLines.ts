@@ -1,17 +1,18 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { findFiles, matchesAny } from '../../utils/glob.js';
-import type { ArchConfig, MaxFileLinesOptions, Violation } from '../../types.js';
+import type { ArchConfig, BaseRuleOptions, MaxFileLinesOptions, Violation } from '../../types.js';
 
 const DEFAULT_TSX_LIMIT = 400;
 const DEFAULT_TS_LIMIT  = 300;
 
 export async function maxFileLines(
   config: ArchConfig,
-  options: MaxFileLinesOptions
+  options: BaseRuleOptions
 ): Promise<Violation[]> {
-  const tsxLimit = options.tsx ?? DEFAULT_TSX_LIMIT;
-  const tsLimit  = options.ts  ?? DEFAULT_TS_LIMIT;
+  const { tsx, ts } = options as MaxFileLinesOptions;
+  const tsxLimit = tsx ?? DEFAULT_TSX_LIMIT;
+  const tsLimit  = ts  ?? DEFAULT_TS_LIMIT;
 
   const pattern = config.root.replace(/\\/g, '/') + '/**/*.{ts,tsx}';
   const files = await findFiles(pattern);

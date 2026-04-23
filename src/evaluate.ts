@@ -24,11 +24,11 @@ const RULES: Record<string, RuleImplementation> = {
   'no-circular-dependencies':              noCircularDependencies,
   'require-barrel-exports':                requireBarrelExports,
   'require-path-alias':                    requirePathAlias,
-  'require-error-hierarchy':               requireErrorHierarchy as RuleImplementation,
+  'require-error-hierarchy':               requireErrorHierarchy,
   'errors-extend-ag-error':                errorsExtendAgError,
-  'require-test-type-suffix':              requireTestTypeSuffix as RuleImplementation,
+  'require-test-type-suffix':              requireTestTypeSuffix,
   'require-hook-prefix':                   requireHookPrefix,
-  'max-file-lines':                        maxFileLines as RuleImplementation,
+  'max-file-lines':                        maxFileLines,
 };
 
 export async function evaluate(

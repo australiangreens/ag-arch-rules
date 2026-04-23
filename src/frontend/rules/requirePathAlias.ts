@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 import { findFiles, matchesAny, toRelative } from '../../utils/glob.js';
 import type { ArchConfig, BaseRuleOptions, Violation } from '../../types.js';
 
-const IMPORT_RE = /(?:^|\n)\s*(?:import|export)\s+(?:.*?\s+from\s+)?['"]([^'"]+)['"]/g;
+const RELATIVE_IMPORT_RE = /from\s+['"](\.\.\/[^'"]+)['"]/gm;
 
 export async function requirePathAlias(
   config: ArchConfig,
@@ -17,17 +17,13 @@ export async function requirePathAlias(
     if (matchesAny(relFile, options.except ?? [])) continue;
 
     const content = fs.readFileSync(file, 'utf8');
-    IMPORT_RE.lastIndex = 0;
-    let match: RegExpExecArray | null;
-
-    while ((match = IMPORT_RE.exec(content)) !== null) {
-      if (match[1].startsWith('..')) {
-        violations.push({
-          file: relFile,
-          message: `uses relative cross-directory import '${match[1]}' — use @/ alias instead`,
-        });
-        break;
-      }
+    RELATIVE_IMPORT_RE.lastIndex = 0;
+    const match = RELATIVE_IMPORT_RE.exec(content);
+    if (match) {
+      violations.push({
+        file: relFile,
+        message: `uses relative cross-directory import '${match[1]}' — use @/ alias instead`,
+      });
     }
   }
 

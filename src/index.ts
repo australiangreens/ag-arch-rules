@@ -5,6 +5,7 @@ export type {
   ArchConfig,
   RulesConfig,
   RuleConfig,
+  RuleSeverity,
   Violation,
   BaseRuleOptions,
   MaxFileLinesOptions,

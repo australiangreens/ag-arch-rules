@@ -47,17 +47,17 @@ export async function noCircularDependencies(
 
   return raw
     .map(v => {
-      const sourceLabel = v.cycle[0].sourceLabel;
-      const targetLabel = v.cycle[0].targetLabel;
-      const relFile = path
-        .relative(process.cwd(), path.join(tsConfigDir, sourceLabel))
-        .replace(/\\/g, '/');
-      const relTarget = path
-        .relative(process.cwd(), path.join(tsConfigDir, targetLabel))
-        .replace(/\\/g, '/');
-      return { rel: relFile, to: relTarget };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const cycleFiles = v.cycle.map((edge: any) =>
+        path.relative(process.cwd(), path.join(tsConfigDir, edge.sourceLabel)).replace(/\\/g, '/')
+      );
+      return {
+        rel: cycleFiles[0] as string,
+        to: (cycleFiles[1] ?? cycleFiles[0]) as string,
+        cycleFiles: cycleFiles as string[],
+      };
     })
-    .filter(({ rel }) => !matchesAny(rel, options.except ?? []))
+    .filter(({ cycleFiles }) => !cycleFiles.some(f => matchesAny(f, options.except ?? [])))
     .map(({ rel, to }) => ({
       file: rel,
       message: `part of circular dependency cycle with ${to}`,
