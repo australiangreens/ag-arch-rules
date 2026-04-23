@@ -10,11 +10,7 @@ The package encodes agreed conventions around layer dependencies, project struct
 npm install --save-dev @australiangreens/ag-arch-rules
 ```
 
-The package is published to GitHub Packages. You'll need an `.npmrc` pointing at the registry:
-
-```
-@australiangreens:registry=https://npm.pkg.github.com
-```
+The package is published to npm.
 
 ## Quick start
 
