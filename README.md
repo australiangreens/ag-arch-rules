@@ -77,6 +77,36 @@ rules: {
 }
 ```
 
+### `tsConfigPath`
+
+By default the rules locate the nearest `tsconfig.json` above `root`. On large projects with project references or many path aliases, pointing the rules at a leaner dedicated config can significantly reduce analysis time:
+
+```ts
+runArchRules(defineArchConfig({
+  root: './src',
+  tsConfigPath: './tsconfig.arch.json',
+  mode: 'enforce',
+  rules: { ...agFrontendPreset.rules },
+}));
+```
+
+A minimal `tsconfig.arch.json` typically strips out `references`, `declaration`, and unrelated `types`, keeping only what the import resolver needs:
+
+```json
+{
+  "compilerOptions": {
+    "module": "ES2022",
+    "moduleResolution": "Node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "paths": { "@/*": ["./src/*"] }
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
 ### `except` patterns
 
 All rules accept an `except` array of glob patterns (CWD-relative) to exclude specific files from the rule:

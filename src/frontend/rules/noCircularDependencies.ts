@@ -1,65 +1,98 @@
-import { projectFiles } from 'archunit';
+import { extractGraph } from 'archunit';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { matchesAny } from '../../utils/glob.js';
+import { matchesAny, toRelative } from '../../utils/glob.js';
 import type { ArchConfig, BaseRuleOptions, Violation } from '../../types.js';
 
-/**
- * Walk up from `startDir` until we find a tsconfig.json, returning its
- * absolute path, or undefined if we reach the filesystem root.
- */
 function findTsConfig(startDir: string): string | undefined {
   let dir = path.resolve(startDir);
   while (true) {
     const candidate = path.join(dir, 'tsconfig.json');
     if (fs.existsSync(candidate)) return candidate;
     const parent = path.dirname(dir);
-    if (parent === dir) return undefined; // filesystem root
+    if (parent === dir) return undefined;
     dir = parent;
   }
+}
+
+/**
+ * DFS-based cycle detection. Finds one representative cycle per back-edge — O(V+E).
+ * Returns arrays of node labels forming each cycle.
+ */
+function findCycles(adj: Map<string, string[]>): string[][] {
+  const WHITE = 0, GRAY = 1, BLACK = 2;
+  const color = new Map<string, number>();
+  const parent = new Map<string, string | undefined>();
+  const cycles: string[][] = [];
+
+  for (const node of adj.keys()) color.set(node, WHITE);
+
+  function dfs(u: string): void {
+    color.set(u, GRAY);
+    for (const v of adj.get(u) ?? []) {
+      if (!color.has(v)) continue; // node outside our subgraph
+      if (color.get(v) === GRAY) {
+        const cycle: string[] = [];
+        let curr: string | undefined = u;
+        while (curr !== undefined && curr !== v) {
+          cycle.unshift(curr);
+          curr = parent.get(curr);
+        }
+        cycle.unshift(v);
+        cycles.push(cycle);
+      } else if (color.get(v) === WHITE) {
+        parent.set(v, u);
+        dfs(v);
+      }
+    }
+    color.set(u, BLACK);
+  }
+
+  for (const node of adj.keys()) {
+    if (color.get(node) === WHITE) {
+      parent.set(node, undefined);
+      dfs(node);
+    }
+  }
+
+  return cycles;
 }
 
 export async function noCircularDependencies(
   config: ArchConfig,
   options: BaseRuleOptions
 ): Promise<Violation[]> {
-  // Resolve the tsconfig to use: explicit path > derived from config.root
   const tsConfigPath = config.tsConfigPath
     ? path.resolve(config.tsConfigPath)
     : findTsConfig(config.root);
 
-  // The directory that archunit treats as project root (where tsconfig lives).
-  // Paths in violation labels will be relative to this directory.
   const tsConfigDir = tsConfigPath ? path.dirname(tsConfigPath) : process.cwd();
-
-  // Build pattern relative to tsConfigDir so it matches archunit's labels.
   const rootAbs = path.resolve(config.root);
   const rootRelToTs = path.relative(tsConfigDir, rootAbs).replace(/\\/g, '/');
-  const srcPattern = rootRelToTs + '/**';
+  const prefix = rootRelToTs ? rootRelToTs + '/' : '';
 
-  const rule = projectFiles(tsConfigPath)
-    .inFolder(srcPattern)
-    .should()
-    .haveNoCycles();
+  const rawEdges = await extractGraph(tsConfigPath);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const raw: any[] = await rule.check({ allowEmptyTests: true });
+  const adj = new Map<string, string[]>();
+  for (const edge of rawEdges) {
+    if (edge.external) continue;
+    if (prefix && (!edge.source.startsWith(prefix) || !edge.target.startsWith(prefix))) continue;
+    if (!adj.has(edge.source)) adj.set(edge.source, []);
+    if (!adj.has(edge.target)) adj.set(edge.target, []); // ensure every node is in the map
+    adj.get(edge.source)!.push(edge.target);
+  }
 
-  return raw
-    .map(v => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const cycleFiles = v.cycle.map((edge: any) =>
-        path.relative(process.cwd(), path.join(tsConfigDir, edge.sourceLabel)).replace(/\\/g, '/')
-      );
-      return {
-        rel: cycleFiles[0] as string,
-        to: (cycleFiles[1] ?? cycleFiles[0]) as string,
-        cycleFiles: cycleFiles as string[],
-      };
-    })
-    .filter(({ cycleFiles }) => !cycleFiles.some(f => matchesAny(f, options.except ?? [])))
-    .map(({ rel, to }) => ({
-      file: rel,
-      message: `part of circular dependency cycle with ${to}`,
-    }));
+  const cycles = findCycles(adj);
+  const violations: Violation[] = [];
+
+  for (const cycle of cycles) {
+    const cycleFiles = cycle.map(f => toRelative(path.join(tsConfigDir, f)));
+    if (cycleFiles.some(f => matchesAny(f, options.except ?? []))) continue;
+    violations.push({
+      file: cycleFiles[0],
+      message: `part of circular dependency cycle: ${cycleFiles.join(' → ')} → ${cycleFiles[0]}`,
+    });
+  }
+
+  return violations;
 }
