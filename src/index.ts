@@ -1,6 +1,7 @@
-export { defineArchConfig } from './defineArchConfig.js';
-export { runArchRules }     from './runArchRules.js';
-export { agFrontendPreset } from './frontend/preset.js';
+export { defineArchConfig }      from './defineArchConfig.js';
+export { runArchRules }          from './runArchRules.js';
+export { agFrontendPreset }      from './frontend/preset.js';
+export { DEFAULT_TEST_FILE_GLOBS } from './defaults.js';
 export type {
   ArchConfig,
   RulesConfig,

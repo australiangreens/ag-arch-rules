@@ -41,6 +41,8 @@ export type RulesConfig = {
 export type ArchConfig = {
   root: string;
   tsConfigPath?: string;
+  /** CWD-relative globs identifying test files. Defaults to DEFAULT_TEST_FILE_GLOBS. */
+  testFiles?: string[];
   mode: 'report' | 'enforce';
   rules: RulesConfig;
 };

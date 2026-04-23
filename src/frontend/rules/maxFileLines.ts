@@ -1,6 +1,6 @@
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { findFiles, matchesAny } from '../../utils/glob.js';
+import { DEFAULT_TEST_FILE_GLOBS } from '../../defaults.js';
 import type { ArchConfig, BaseRuleOptions, MaxFileLinesOptions, Violation } from '../../types.js';
 
 const DEFAULT_TSX_LIMIT = 400;
@@ -14,13 +14,13 @@ export async function maxFileLines(
   const tsxLimit = tsx ?? DEFAULT_TSX_LIMIT;
   const tsLimit  = ts  ?? DEFAULT_TS_LIMIT;
 
+  const testGlobs = config.testFiles ?? DEFAULT_TEST_FILE_GLOBS;
   const pattern = config.root.replace(/\\/g, '/') + '/**/*.{ts,tsx}';
   const files = await findFiles(pattern);
   const violations: Violation[] = [];
 
   for (const file of files) {
-    const basename = path.basename(file);
-    if (/\.(test|spec)\./.test(basename)) continue;
+    if (matchesAny(file, testGlobs)) continue;
     if (matchesAny(file, options.except ?? [])) continue;
 
     const content = fs.readFileSync(file, 'utf8');
