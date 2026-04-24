@@ -14,7 +14,9 @@ The package is published to npmjs.com.
 
 ## Quick start
 
-Create `arch.check.ts` in your project root (not inside `src/`):
+Create two files in your project root (not inside `src/`).
+
+**`arch.check.ts`** — your rule configuration:
 
 ```ts
 import { agFrontendPreset, defineArchConfig, runArchRules } from '@australiangreens/ag-arch-rules';
@@ -28,11 +30,18 @@ runArchRules(defineArchConfig({
 }));
 ```
 
+**`arch.vitest.config.ts`** — Vitest settings for the arch check:
+
+```ts
+import { defineArchVitestConfig } from '@australiangreens/ag-arch-rules';
+export default defineArchVitestConfig();
+```
+
 Add a script to `package.json`:
 
 ```json
 "scripts": {
-  "arch:check": "vitest run --reporter=verbose arch.check.ts"
+  "arch:check": "vitest run --config arch.vitest.config.ts --reporter=verbose"
 }
 ```
 
@@ -53,6 +62,34 @@ A typed identity function that provides TypeScript inference and IDE autocomplet
 ### `runArchRules`
 
 Registers one Vitest `it()` block per enabled rule under a `describe('Architecture')` suite. Call it at the top level of your check file — not inside a test block.
+
+### `defineArchVitestConfig`
+
+Returns a Vitest inline config object with defaults suited to running arch checks. Pass its result as the default export of your `arch.vitest.config.ts`.
+
+```ts
+import { defineArchVitestConfig } from '@australiangreens/ag-arch-rules';
+export default defineArchVitestConfig();
+```
+
+All options are optional:
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `checkFile` | `string` | `'arch.check.ts'` | Path to the arch check file to run |
+| `pool` | `string` | `'forks'` | Vitest worker pool. `'forks'` is required for the dependency-graph rules that use native Node.js APIs |
+| `testTimeout` | `number` | `30000` | Test timeout in milliseconds. Arch checks analyse the full dependency graph and can take several seconds |
+
+`globals: true` is always set — `archunit` extends Vitest's `expect` at startup and requires it to be available globally.
+
+Override individual options as needed:
+
+```ts
+export default defineArchVitestConfig({
+  checkFile: 'my.arch.check.ts',
+  testTimeout: 60000,
+});
+```
 
 ### `mode`
 
@@ -75,7 +112,9 @@ rules: {
 
 ### `tsConfigPath`
 
-By default the rules locate the nearest `tsconfig.json` above `root`. On large projects with project references or many path aliases, pointing the rules at a leaner dedicated config can significantly reduce analysis time:
+By default the rules locate the nearest `tsconfig.json` by walking up the directory tree from `root`. This works for most projects and no explicit `tsConfigPath` is needed.
+
+If you find analysis is slow on a project with many path aliases or project references, you can point the rules at a leaner dedicated config:
 
 ```ts
 runArchRules(defineArchConfig({
@@ -86,7 +125,7 @@ runArchRules(defineArchConfig({
 }));
 ```
 
-A minimal `tsconfig.arch.json` typically strips out `references`, `declaration`, and unrelated `types`, keeping only what the import resolver needs:
+A minimal `tsconfig.arch.json` strips out `references`, `declaration`, and unrelated `types`, keeping only what the import resolver needs:
 
 ```json
 {

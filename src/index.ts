@@ -1,6 +1,7 @@
-export { defineArchConfig }      from './defineArchConfig.js';
-export { runArchRules }          from './runArchRules.js';
-export { agFrontendPreset }      from './frontend/preset.js';
+export { defineArchConfig }        from './defineArchConfig.js';
+export { defineArchVitestConfig }  from './defineArchVitestConfig.js';
+export { runArchRules }            from './runArchRules.js';
+export { agFrontendPreset }        from './frontend/preset.js';
 export { DEFAULT_TEST_FILE_GLOBS } from './defaults.js';
 export type {
   ArchConfig,
@@ -13,3 +14,4 @@ export type {
   RequireErrorHierarchyOptions,
   RequireTestTypeSuffixOptions,
 } from './types.js';
+export type { ArchVitestConfigOptions } from './defineArchVitestConfig.js';
