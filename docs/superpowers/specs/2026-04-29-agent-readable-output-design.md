@@ -66,9 +66,9 @@ violations.push({ file: relFile, line, message: ... });
 
 ### Investigate during implementation
 
-**`layerDependency`** (powers `no-components-depend-on-*`, `no-types-depend-on-runtime-layers`, `no-constants-depend-on-runtime-layers`) — archunit's raw violation objects currently provide `v.dependency.sourceLabel` and `v.dependency.targetLabel`. Before implementing, check whether the archunit API also exposes a source line (e.g. `v.dependency.sourceLine`).
+**`layerDependency`** (powers `no-apis-depend-on-components`, `no-apis-depend-on-pages`, `no-components-depend-on-pages`, `no-hooks-depend-on-pages`, `no-types-depend-on-runtime-layers`, `no-constants-depend-on-runtime-layers`) — archunit's raw violation objects currently provide `v.dependency.sourceLabel` and `v.dependency.targetLabel`. Before implementing, check whether the archunit API also exposes a source line (e.g. `v.dependency.sourceLine`).
 
-- **If it does:** populate `line` on the violation. Covers 5 rules in one change.
+- **If it does:** populate `line` on the violation. Covers 6 rules in one change.
 - **If it doesn't:** leave `line` as `undefined` and add a comment in `layerDependency.ts` documenting that this was investigated and not available.
 
 ### Not meaningful — leave as `undefined`
