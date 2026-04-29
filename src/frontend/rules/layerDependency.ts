@@ -61,6 +61,9 @@ export async function checkLayerDependency(
       to:  path.relative(process.cwd(), to).replace(/\\/g, '/'),
     }))
     .filter(({ rel }) => !matchesAny(rel, options.except ?? []))
+    // archunit violations expose only sourceLabel/targetLabel — no source line is available.
+    // Investigated against archunit@2.x: cumulatedEdges carry {source,target,external,importKinds}
+    // only. line is therefore omitted from these violations.
     .map(({ rel, to }) => ({
       file: rel,
       message: `imports from ${to}`,
