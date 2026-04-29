@@ -18,8 +18,9 @@ export async function requirePathAlias(
 
     const content = fs.readFileSync(file, 'utf8');
     RELATIVE_IMPORT_RE.lastIndex = 0;
-    const match = RELATIVE_IMPORT_RE.exec(content);
-    if (match) {
+    RELATIVE_IMPORT_RE.lastIndex = 0;
+    let match: RegExpExecArray | null;
+    while ((match = RELATIVE_IMPORT_RE.exec(content)) !== null) {
       const line = content.slice(0, match.index).split('\n').length;
       violations.push({
         file: relFile,
