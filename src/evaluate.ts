@@ -23,7 +23,7 @@ import { noEndpointsDependOnEndpoints } from './backend-node/rules/noEndpointsDe
 import { noModelsDependOnEndpoints }    from './backend-node/rules/noModelsDependOnEndpoints.js';
 import { noMiddlewareDependsOnModels }  from './backend-node/rules/noMiddlewareDependsOnModels.js';
 import { requireValidationSchema }      from './backend-node/rules/requireValidationSchema.js';
-import { noDirectDbClientInEndpoints }  from './backend-node/rules/noDirectDbClientInEndpoints.js';
+import { restrictDbClientToApprovedZones } from './backend-node/rules/restrictDbClientToApprovedZones.js';
 
 const RULES: Record<string, RuleImplementation> = {
   // Common
@@ -47,7 +47,7 @@ const RULES: Record<string, RuleImplementation> = {
   'no-models-depend-on-endpoints':         noModelsDependOnEndpoints,
   'no-middleware-depends-on-models':       noMiddlewareDependsOnModels,
   'require-validation-schema':             requireValidationSchema,
-  'no-direct-db-client-in-endpoints':      noDirectDbClientInEndpoints,
+  'restrict-db-client-to-approved-zones':  restrictDbClientToApprovedZones,
 };
 
 export async function evaluate(

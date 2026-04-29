@@ -158,13 +158,24 @@ These rules are included in `agBackendNodePreset` and apply to NodeJS/ExpressJS 
 
 ### `no-endpoints-depend-on-endpoints`
 
-Router modules (`src/endpoints/*/`) must not import from sibling endpoint directories. Each endpoint should be self-contained; cross-endpoint imports create coupling that breaks independent testability and obscures the routing contract.
+Router modules must not import from other endpoint features. Each feature should be self-contained; cross-feature endpoint imports create coupling that breaks independent testability and obscures routing contracts.
 
 The root `endpoints/index.ts` aggregator (which legitimately imports all subrouters) is excluded from this check.
 
 ```ts
 // src/endpoints/lists/index.ts — VIOLATION
 import groupsRouter from '../groups';
+```
+
+Config options:
+
+```ts
+'no-endpoints-depend-on-endpoints': ['error', {
+  featureRootDepth: 1,      // default
+  pathAliases: ['@/'],      // alias prefixes resolved from config.root
+  allowIntraFeature: true,  // default
+  allowTargetGlobs: ['src/endpoints/shared/**'],
+}],
 ```
 
 ### `no-models-depend-on-endpoints`
@@ -178,11 +189,20 @@ import { parseListId } from '../../endpoints/lists/utils';
 
 ### `no-middleware-depends-on-models`
 
-Middleware modules (`src/middlewares/`) must not import from the models layer (`src/models/`). Middleware handles cross-cutting concerns (authentication, error formatting); reaching into the data layer couples it to business logic.
+Middleware modules (`src/middlewares/`) should not import from domain model layers. Middleware handles cross-cutting concerns (authentication, error formatting); reaching into domain/data logic couples it to business behavior.
 
 ```ts
 // src/middlewares/authHandler/index.ts — VIOLATION
 import { User } from '../../models/db/User';
+```
+
+Use options to distinguish domain-model zones from infra adapters:
+
+```ts
+'no-middleware-depends-on-models': ['warn', {
+  forbiddenModelGlobs: ['src/models/domain/**', 'src/models/db/**'],
+  allowedModelGlobs: ['src/models/infra/**'],
+}],
 ```
 
 ### `require-validation-schema`
@@ -199,12 +219,27 @@ src/endpoints/reports/
   validationSchemas.ts  ✗ VIOLATION
 ```
 
-### `no-direct-db-client-in-endpoints`
+`except` patterns for this rule are matched against the missing schema file path (for example `src/endpoints/reports/validationSchemas.ts`), not `index.ts`.
 
-Endpoint files (`src/endpoints/**`) must not import the database client (`knexClient`) or the `knex` package directly. All database access must go through the models layer, keeping HTTP handlers free of query logic.
+### `restrict-db-client-to-approved-zones`
+
+Only approved paths may import DB client modules. This replaces endpoint-only DB checks by enforcing project-wide DB client boundaries.
 
 ```ts
-// src/endpoints/lists/index.ts — VIOLATION
-import db from '../../models/db/knexClient';
-import knex from 'knex';
+// src/endpoints/lists/index.ts — VIOLATION (outside approved zones)
+import db from '../models/db/knexClient';
+
+// src/models/db/ListRepository.ts — allowed when importer matches allowedImporterGlobs
+import db from './knexClient';
+```
+
+Config options:
+
+```ts
+'restrict-db-client-to-approved-zones': ['error', {
+  allowedImporterGlobs: ['src/models/db/**/*.ts', 'src/scripts/db/**/*.ts'],
+  dbModuleSpecifiers: ['knex', 'knexClient'],
+  dbSpecifierRegexes: ['[/\\\\]dbClient$'],
+  includeRequire: true, // default
+}],
 ```

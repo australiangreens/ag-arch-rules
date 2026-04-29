@@ -23,6 +23,35 @@ export type RequireBarrelExportsOptions = BaseRuleOptions & {
   directories?: string[];
 };
 
+export type NoEndpointsDependOnEndpointsOptions = BaseRuleOptions & {
+  /** Number of path segments under endpoints/ used to define a "feature". Default: 1 */
+  featureRootDepth?: number;
+  /** Path aliases that resolve to config.root (for example ['@/', 'src/']). */
+  pathAliases?: string[];
+  /** When true, imports within the same feature are allowed. Default: true */
+  allowIntraFeature?: boolean;
+  /** CWD-relative target path globs that are always allowed. */
+  allowTargetGlobs?: string[];
+};
+
+export type NoMiddlewareDependsOnModelsOptions = BaseRuleOptions & {
+  /** Report only dependencies matching these target globs (CWD-relative). */
+  forbiddenModelGlobs?: string[];
+  /** Ignore dependencies matching these target globs (CWD-relative). */
+  allowedModelGlobs?: string[];
+};
+
+export type RestrictDbClientToApprovedZonesOptions = BaseRuleOptions & {
+  /** CWD-relative globs allowed to import DB client modules. */
+  allowedImporterGlobs?: string[];
+  /** Module specifiers treated as DB clients. */
+  dbModuleSpecifiers?: string[];
+  /** Additional regex patterns (as strings) matched against import specifier text. */
+  dbSpecifierRegexes?: string[];
+  /** Check CommonJS require() calls as well as import/export statements. Default: true */
+  includeRequire?: boolean;
+};
+
 export type RuleConfig<O extends BaseRuleOptions = BaseRuleOptions> =
   | RuleSeverity
   | [RuleSeverity, O];
@@ -47,11 +76,11 @@ export type RulesConfig = {
   'require-hook-prefix'?:                   RuleConfig;
 
   // Backend Node rules
-  'no-endpoints-depend-on-endpoints'?:      RuleConfig;
+  'no-endpoints-depend-on-endpoints'?:      RuleConfig<NoEndpointsDependOnEndpointsOptions>;
   'no-models-depend-on-endpoints'?:         RuleConfig;
-  'no-middleware-depends-on-models'?:       RuleConfig;
+  'no-middleware-depends-on-models'?:       RuleConfig<NoMiddlewareDependsOnModelsOptions>;
   'require-validation-schema'?:             RuleConfig;
-  'no-direct-db-client-in-endpoints'?:      RuleConfig;
+  'restrict-db-client-to-approved-zones'?:  RuleConfig<RestrictDbClientToApprovedZonesOptions>;
 };
 
 export type ArchConfig = {

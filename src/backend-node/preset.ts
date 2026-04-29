@@ -14,6 +14,6 @@ export const agBackendNodePreset = {
     'no-models-depend-on-endpoints':         'error',
     'no-middleware-depends-on-models':       'warn',
     'require-validation-schema':             'error',
-    'no-direct-db-client-in-endpoints':      'error',
+    'restrict-db-client-to-approved-zones':  'error',
   } satisfies RulesConfig,
 } as const;
