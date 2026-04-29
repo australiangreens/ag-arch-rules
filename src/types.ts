@@ -81,6 +81,22 @@ export type RulesConfig = {
   'no-middleware-depends-on-models'?:       RuleConfig<NoMiddlewareDependsOnModelsOptions>;
   'require-validation-schema'?:             RuleConfig;
   'restrict-db-client-to-approved-zones'?:  RuleConfig<RestrictDbClientToApprovedZonesOptions>;
+
+  // CDK rules
+  'require-custom-nodejs-construct'?:       RuleConfig;
+  'require-node-runtime-22'?:              RuleConfig;
+  'require-esbuild-source-maps'?:          RuleConfig;
+  'require-pay-per-request-billing'?:      RuleConfig;
+  'require-dynamo-removal-policy'?:        RuleConfig;
+  'no-hardcoded-secret-values'?:           RuleConfig;
+  'require-secrets-manager-grants'?:       RuleConfig;
+  'require-api-authentication'?:           RuleConfig;
+  'no-lambda-imports-from-infra'?:         RuleConfig;
+  'require-lambda-handler-export'?:        RuleConfig;
+  'require-cdk-json'?:                     RuleConfig;
+  'require-bin-directory'?:               RuleConfig;
+  'require-infra-directory'?:             RuleConfig;
+  'require-env-local-example'?:           RuleConfig;
 };
 
 export type ArchConfig = {
