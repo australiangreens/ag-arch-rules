@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { maxFileLines } from '../../../src/frontend/rules/maxFileLines.js';
+import { maxFileLines } from '../../../src/common/rules/maxFileLines.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/project/src';
 const baseConfig = { root: FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };

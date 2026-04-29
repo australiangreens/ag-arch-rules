@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { requireErrorHierarchy } from '../../../src/frontend/rules/requireErrorHierarchy.js';
+import { requireErrorHierarchy } from '../../../src/common/rules/requireErrorHierarchy.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/project/src';
 const baseConfig = { root: FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };

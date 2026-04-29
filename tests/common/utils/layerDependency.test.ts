@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { checkLayerDependency } from '../../../src/frontend/rules/layerDependency.js';
+import { checkLayerDependency } from '../../../src/common/utils/layerDependency.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/project/src';
 const baseConfig = { root: FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };

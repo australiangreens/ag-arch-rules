@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { requireBarrelExports } from '../../../src/frontend/rules/requireBarrelExports.js';
+import { requireBarrelExports } from '../../../src/common/rules/requireBarrelExports.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/project/src';
 const baseConfig = { root: FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };

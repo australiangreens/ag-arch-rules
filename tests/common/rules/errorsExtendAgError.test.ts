@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { errorsExtendAgError } from '../../../src/frontend/rules/errorsExtendAgError.js';
+import { errorsExtendAgError } from '../../../src/common/rules/errorsExtendAgError.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/project/src';
 const baseConfig = { root: FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { noCircularDependencies } from '../../../src/frontend/rules/noCircularDependencies.js';
+import { noCircularDependencies } from '../../../src/common/rules/noCircularDependencies.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/project/src';
 const baseConfig = { root: FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };

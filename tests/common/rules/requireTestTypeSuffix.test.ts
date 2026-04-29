@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { requireTestTypeSuffix } from '../../../src/frontend/rules/requireTestTypeSuffix.js';
+import { requireTestTypeSuffix } from '../../../src/common/rules/requireTestTypeSuffix.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/project/src';
 const baseConfig = { root: FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };

@@ -1,4 +1,4 @@
-import { checkLayerDependency } from './layerDependency.js';
+import { checkLayerDependency } from '../../common/utils/layerDependency.js';
 import type { ArchConfig, BaseRuleOptions, Violation } from '../../types.js';
 
 export async function noComponentsOnPages(config: ArchConfig, options: BaseRuleOptions): Promise<Violation[]> {
