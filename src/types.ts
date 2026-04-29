@@ -50,6 +50,21 @@ export type ArchConfig = {
 export type Violation = {
   file: string;
   message: string;
+  line?: number;
+};
+
+export type RuleResult = {
+  rule: string;
+  severity: RuleSeverity;
+  violations: Violation[];
+};
+
+export type JsonViolationRecord = {
+  rule: string;
+  severity: RuleSeverity;
+  file: string;
+  line?: number;
+  message: string;
 };
 
 export type RuleImplementation = (
