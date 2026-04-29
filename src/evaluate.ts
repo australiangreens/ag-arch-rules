@@ -25,6 +25,22 @@ import { noMiddlewareDependsOnModels }  from './backend-node/rules/noMiddlewareD
 import { requireValidationSchema }      from './backend-node/rules/requireValidationSchema.js';
 import { restrictDbClientToApprovedZones } from './backend-node/rules/restrictDbClientToApprovedZones.js';
 
+// CDK rules
+import { requireCustomNodejsConstruct } from './cdk/rules/requireCustomNodejsConstruct.js';
+import { requireNodeRuntime22 }         from './cdk/rules/requireNodeRuntime22.js';
+import { requireEsbuildSourceMaps }     from './cdk/rules/requireEsbuildSourceMaps.js';
+import { requirePayPerRequestBilling }  from './cdk/rules/requirePayPerRequestBilling.js';
+import { requireDynamoRemovalPolicy }   from './cdk/rules/requireDynamoRemovalPolicy.js';
+import { noHardcodedSecretValues }      from './cdk/rules/noHardcodedSecretValues.js';
+import { requireSecretsManagerGrants }  from './cdk/rules/requireSecretsManagerGrants.js';
+import { requireApiAuthentication }     from './cdk/rules/requireApiAuthentication.js';
+import { noLambdaImportsFromInfra }     from './cdk/rules/noLambdaImportsFromInfra.js';
+import { requireLambdaHandlerExport }   from './cdk/rules/requireLambdaHandlerExport.js';
+import { requireCdkJson }               from './cdk/rules/requireCdkJson.js';
+import { requireBinDirectory }          from './cdk/rules/requireBinDirectory.js';
+import { requireInfraDirectory }        from './cdk/rules/requireInfraDirectory.js';
+import { requireEnvLocalExample }       from './cdk/rules/requireEnvLocalExample.js';
+
 const RULES: Record<string, RuleImplementation> = {
   // Common
   'no-circular-dependencies':              noCircularDependencies,
@@ -48,6 +64,21 @@ const RULES: Record<string, RuleImplementation> = {
   'no-middleware-depends-on-models':       noMiddlewareDependsOnModels,
   'require-validation-schema':             requireValidationSchema,
   'restrict-db-client-to-approved-zones':  restrictDbClientToApprovedZones,
+  // CDK
+  'require-custom-nodejs-construct':       requireCustomNodejsConstruct,
+  'require-node-runtime-22':              requireNodeRuntime22,
+  'require-esbuild-source-maps':          requireEsbuildSourceMaps,
+  'require-pay-per-request-billing':      requirePayPerRequestBilling,
+  'require-dynamo-removal-policy':        requireDynamoRemovalPolicy,
+  'no-hardcoded-secret-values':           noHardcodedSecretValues,
+  'require-secrets-manager-grants':       requireSecretsManagerGrants,
+  'require-api-authentication':           requireApiAuthentication,
+  'no-lambda-imports-from-infra':         noLambdaImportsFromInfra,
+  'require-lambda-handler-export':        requireLambdaHandlerExport,
+  'require-cdk-json':                     requireCdkJson,
+  'require-bin-directory':               requireBinDirectory,
+  'require-infra-directory':             requireInfraDirectory,
+  'require-env-local-example':           requireEnvLocalExample,
 };
 
 export async function evaluate(
