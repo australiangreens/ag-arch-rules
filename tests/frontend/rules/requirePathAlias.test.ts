@@ -28,4 +28,11 @@ describe('requirePathAlias', () => {
     });
     expect(violations.every(v => !v.file.includes('RelativeImporter'))).toBe(true);
   });
+
+  it('populates line number on violations', async () => {
+    const violations = await requirePathAlias(baseConfig, {});
+    const relativeImporterViolation = violations.find(v => v.file.includes('RelativeImporter'));
+    expect(relativeImporterViolation).toBeDefined();
+    expect(relativeImporterViolation!.line).toBe(1);
+  });
 });

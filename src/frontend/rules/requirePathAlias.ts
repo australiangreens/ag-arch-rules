@@ -20,8 +20,10 @@ export async function requirePathAlias(
     RELATIVE_IMPORT_RE.lastIndex = 0;
     const match = RELATIVE_IMPORT_RE.exec(content);
     if (match) {
+      const line = content.slice(0, match.index).split('\n').length;
       violations.push({
         file: relFile,
+        line,
         message: `uses relative cross-directory import '${match[1]}' — use @/ alias instead`,
       });
     }
