@@ -13,5 +13,7 @@ export type {
   MaxFileLinesOptions,
   RequireErrorHierarchyOptions,
   RequireTestTypeSuffixOptions,
+  RuleResult,
+  JsonViolationRecord,
 } from './types.js';
 export type { ArchVitestConfigOptions } from './defineArchVitestConfig.js';
