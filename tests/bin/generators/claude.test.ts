@@ -61,4 +61,9 @@ describe('generateClaude', () => {
     const content = fs.readFileSync(path.join(tmpDir, 'CLAUDE.md'), 'utf8');
     expect(content).toContain('v3.1.4');
   });
+
+  it('returns the written filename', () => {
+    const result = generateClaude(tmpDir, [], '1.0.0');
+    expect(result).toEqual(['CLAUDE.md']);
+  });
 });

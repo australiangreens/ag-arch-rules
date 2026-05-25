@@ -61,4 +61,9 @@ describe('generateGemini', () => {
     const content = fs.readFileSync(path.join(tmpDir, 'GEMINI.md'), 'utf8');
     expect(content).toContain('v2.0.0');
   });
+
+  it('returns the written filename', () => {
+    const result = generateGemini(tmpDir, [], '1.0.0');
+    expect(result).toEqual(['GEMINI.md']);
+  });
 });

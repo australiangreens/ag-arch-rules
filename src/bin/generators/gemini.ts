@@ -6,10 +6,11 @@ export function generateGemini(
   projectRoot: string,
   selectedPresets: string[],
   version: string,
-): void {
+): string[] {
   const geminiPath = path.join(projectRoot, 'GEMINI.md');
   const existing = fs.existsSync(geminiPath) ? fs.readFileSync(geminiPath, 'utf8') : '';
   const section = buildMarkdownContent(selectedPresets, version);
   const updated = upsertSentinelSection(existing, section);
   fs.writeFileSync(geminiPath, updated);
+  return ['GEMINI.md'];
 }

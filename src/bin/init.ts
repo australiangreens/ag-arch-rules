@@ -1,17 +1,20 @@
-import { multiselect, intro, outro, isCancel, cancel } from '@clack/prompts';
+import { multiselect, intro, outro, isCancel, cancel, log } from '@clack/prompts';
 import { generateCursor } from './generators/cursor.js';
 import { generateClaude } from './generators/claude.js';
 import { generateGemini } from './generators/gemini.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
 
 function getVersion(): string {
-  const __filename = fileURLToPath(import.meta.url);
-  const pkgPath = path.join(dirname(__filename), '../../package.json');
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as { version: string };
-  return pkg.version;
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const pkgPath = path.join(path.dirname(__filename), '../../package.json');
+    const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8')) as { version: string };
+    return pkg.version;
+  } catch {
+    return 'unknown';
+  }
 }
 
 async function main(): Promise<void> {
@@ -55,16 +58,16 @@ async function main(): Promise<void> {
     written.push(...files);
   }
   if ((tools as string[]).includes('claude')) {
-    generateClaude(projectRoot, presets as string[], version);
-    written.push('CLAUDE.md');
+    const files = generateClaude(projectRoot, presets as string[], version);
+    written.push(...files);
   }
   if ((tools as string[]).includes('gemini')) {
-    generateGemini(projectRoot, presets as string[], version);
-    written.push('GEMINI.md');
+    const files = generateGemini(projectRoot, presets as string[], version);
+    written.push(...files);
   }
 
   for (const file of written) {
-    console.log(`  ✓ ${file}`);
+    log.success(file);
   }
 
   outro('Done! Commit the generated files so your team benefits immediately.');
