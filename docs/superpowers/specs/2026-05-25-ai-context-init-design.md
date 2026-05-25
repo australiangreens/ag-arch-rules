@@ -111,7 +111,18 @@ On re-run, the section between the sentinel comments is replaced. Content outsid
 
 ### Gemini
 
-`GEMINI.md` is created or overwritten entirely. Because `GEMINI.md` is typically owned by tooling rather than developers, a full overwrite is safe and simpler than sentinel-based replacement.
+A fenced section is appended to `GEMINI.md` (created if absent), using the same sentinel pattern as Claude Code:
+
+```markdown
+<!-- ag-arch-rules: begin -->
+## Architectural Rules
+
+...rule content...
+
+<!-- ag-arch-rules: end -->
+```
+
+On re-run, the section between the sentinel comments is replaced. Content outside the sentinels is preserved.
 
 ## Content Source
 
