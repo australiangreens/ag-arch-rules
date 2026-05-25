@@ -1,6 +1,6 @@
 {
   "name": "@australiangreens/ag-arch-rules",
-  "version": "0.9.1",
+  "version": "1.1.0",
   "type": "module",
   "bin": {
     "ag-arch-rules": "./dist/bin/init.js"
@@ -20,7 +20,9 @@
   ],
   "scripts": {
     "build": "tsup",
-    "test": "vitest run"
+    "test": "vitest run",
+    "release": "node scripts/release.js",
+    "ship": "pnpm test && pnpm build && pnpm publish --no-git-checks"
   },
   "peerDependencies": {
     "vitest": ">=1.0.0"
