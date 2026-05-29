@@ -53,6 +53,29 @@ npm run arch:check
 
 In `report` mode, violations are logged to stderr but tests still pass — useful when first adopting the rules on an existing codebase. Switch to `enforce` when you're ready to make violations fail the build.
 
+## AI agent context files
+
+Run the `init` command to generate context files that teach your AI coding agents (Claude Code, Cursor, Gemini) about the architectural rules active in this project:
+
+```sh
+npx ag-arch-rules init
+```
+
+The command asks two questions:
+
+1. **Which AI tools** — select any combination of Claude Code, Cursor, and Gemini.
+2. **Which rule sets** — select the presets that apply to the project (Frontend, Backend Node, CDK).
+
+### What gets generated
+
+| Tool | File(s) written |
+|---|---|
+| Claude Code | `CLAUDE.md` — rule documentation upserted into a sentinel section; existing content is preserved |
+| Gemini | `GEMINI.md` — same upsert behaviour as `CLAUDE.md` |
+| Cursor | `.cursor/rules/ag-arch-rules-common.mdc` (always) + one `.mdc` per selected preset |
+
+Re-run `ag-arch-rules init` after upgrading the package to refresh the generated content. Commit the generated files so your whole team benefits.
+
 ## Configuration
 
 ### `defineArchConfig`
