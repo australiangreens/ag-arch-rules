@@ -243,3 +243,137 @@ Config options:
   includeRequire: true, // default
 }],
 ```
+
+---
+
+## CDK Rules
+
+These rules are included in `agCdkPreset` and apply to AWS CDK projects. The preset assumes the standard project layout: `bin/` for the CDK app entry point, `infra/` for construct code, and `lambda/` for handler code.
+
+### `require-custom-nodejs-construct`
+
+The `infra/constructs/` directory must exist and contain at least one file that wraps `NodejsFunction`. A project-specific subclass centralises shared runtime defaults (runtime version, bundling config, environment variables) so they cannot drift across individual Lambda definitions.
+
+```
+infra/constructs/           ✗ missing — VIOLATION
+infra/constructs/AppFn.ts   ✓ (must reference NodejsFunction)
+```
+
+### `require-node-runtime-22`
+
+`NodejsFunction` wrapper constructs in `infra/constructs/` must specify Node.js 22 or higher (`Runtime.NODEJS_22_X`, `NODEJS_LATEST`, or any later version). Older runtimes are approaching or past end-of-life and lack current security patches.
+
+```ts
+// infra/constructs/AppFn.ts — VIOLATION
+runtime: Runtime.NODEJS_18_X
+
+// Correct
+runtime: Runtime.NODEJS_22_X
+```
+
+### `require-esbuild-source-maps`
+
+`NodejsFunction` constructs must set `sourceMap: true` in their bundling config. Without source maps, CloudWatch error traces point to minified esbuild output rather than the original TypeScript source, making debugging impractical.
+
+```ts
+// infra/constructs/AppFn.ts — VIOLATION (no sourceMap)
+bundling: { minify: true }
+
+// Correct
+bundling: { minify: true, sourceMap: true }
+```
+
+### `require-pay-per-request-billing`
+
+Every DynamoDB `Table` defined in `infra/` must use `PAY_PER_REQUEST` billing mode. Provisioned throughput requires capacity planning and can incur unexpected costs; on-demand billing is the safe default for most workloads. Override this rule explicitly if provisioned capacity is justified.
+
+```ts
+// infra/stacks/AppStack.ts — VIOLATION
+new Table(this, 'MyTable', { ... });  // no billingMode
+
+// Correct
+new Table(this, 'MyTable', { billingMode: BillingMode.PAY_PER_REQUEST, ... });
+```
+
+### `require-dynamo-removal-policy`
+
+When DynamoDB tables are present, the `infra/` code must include both `RemovalPolicy.RETAIN` and `RemovalPolicy.DESTROY`, indicating that a conditional removal policy is in place. A table that always retains data can block stack teardown; one that always destroys data is dangerous in production. The expected pattern is a condition (e.g. based on environment) that selects the appropriate policy.
+
+```ts
+// Correct — conditional policy
+removalPolicy: isProd ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY
+```
+
+### `no-hardcoded-secret-values`
+
+Property names matching `*SECRET*`, `*_API_KEY*`, `*PASSWORD*`, or `*TOKEN*` must not be assigned string literal values in `infra/` files. Hardcoded secrets are committed to version control and baked into synthesis output. Read values from `process.env.*` at synthesis time and inject them via Secrets Manager or environment variables.
+
+```ts
+// infra/stacks/AppStack.ts — VIOLATION
+{ STRIPE_API_KEY: 'sk_live_abc123' }
+
+// Correct
+{ STRIPE_API_KEY: process.env.STRIPE_API_KEY! }
+```
+
+### `require-secrets-manager-grants`
+
+When `secretsmanager` is referenced in `infra/` code, at least one `.grantRead()` call must also be present. Secrets Manager access is controlled by IAM; a secret that is created or referenced but never granted to a Lambda will cause runtime permission errors.
+
+```ts
+// Correct
+const secret = Secret.fromSecretNameV2(this, 'ApiKey', 'my-api-key');
+secret.grantRead(myFunction);
+```
+
+### `require-api-authentication`
+
+API Gateway constructs in `infra/` must have authentication configured. Accepted patterns are: an API key with usage plan, a custom Lambda `TokenAuthorizer`, a `RequestAuthorizer`, or `authorizationType: AuthorizationType.CUSTOM`. If an unauthenticated API is intentional, set this rule to `"off"` explicitly.
+
+```ts
+// Correct — API key + usage plan
+const key = api.addApiKey('ApiKey');
+const plan = new UsagePlan(this, 'Plan', { ... });
+plan.addApiKey(key);
+```
+
+---
+
+### `no-lambda-imports-from-infra`
+
+Lambda handler files in `lambda/` must not import from `infra/`. Handler code runs at AWS request time; CDK construct code runs at synthesis time. Importing constructs into a handler creates a runtime dependency on synthesis-only modules and will cause deployment failures.
+
+```ts
+// lambda/myHandler/index.ts — VIOLATION
+import { AppFn } from '../../infra/constructs/AppFn';
+```
+
+### `require-lambda-handler-export`
+
+Lambda entry-point files (`lambda/*.ts` and `lambda/*/index.ts`) must export a `handler` function. AWS Lambda invokes the export named `handler` by convention; a missing or differently named export causes silent failures at invocation time.
+
+```ts
+// lambda/myHandler/index.ts — VIOLATION (no handler export)
+export async function processEvent(event: APIGatewayEvent) { ... }
+
+// Correct
+export async function handler(event: APIGatewayEvent) { ... }
+```
+
+---
+
+### `require-cdk-json`
+
+A `cdk.json` file must exist at the project root. Its absence indicates the project has not been initialised as a CDK app and the CDK CLI will refuse to run.
+
+### `require-bin-directory`
+
+A `bin/` directory must exist at the project root. The CDK app entry point (the file that instantiates stacks) belongs in `bin/` by CDK convention and is referenced by `cdk.json`.
+
+### `require-infra-directory`
+
+An `infra/` directory must exist at the project root. Infrastructure construct code must be separated from Lambda handler code so that synthesis-time and runtime dependencies cannot be mixed.
+
+### `require-env-local-example`
+
+A `.env.local.example` file must exist at the project root. CDK synthesis depends on environment variables (account IDs, region, API keys passed at synth time); this file documents the required variables so new contributors can set up their local environment without reverse-engineering the stack code.
