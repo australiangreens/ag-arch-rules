@@ -2,6 +2,9 @@
   "name": "@australiangreens/ag-arch-rules",
   "version": "1.1.2",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "bin": {
     "ag-arch-rules": "./dist/bin/init.js"
   },
@@ -28,19 +31,19 @@
     "vitest": ">=1.0.0"
   },
   "dependencies": {
-    "@clack/prompts": "^0.9.0",
-    "archunit": "^2.1.0",
-    "glob": "^11.0.0",
+    "@clack/prompts": "^1.7.0",
+    "archunit": "^2.4.0",
+    "glob": "^13.0.6",
     "madge": "^8.0.0",
     "micromatch": "^4.0.0"
   },
   "devDependencies": {
     "@types/madge": "^5.0.3",
     "@types/micromatch": "^4.0.0",
-    "@types/node": "^25.6.0",
+    "@types/node": "^22.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "vitest": "^3.0.0"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@10.30.3"
 }
