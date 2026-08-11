@@ -5,6 +5,9 @@
     "moduleResolution": "NodeNext",
     "strict": true,
     "declaration": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "ignoreDeprecations": "6.0",
     "outDir": "./dist",
     "rootDir": "./src"
   },

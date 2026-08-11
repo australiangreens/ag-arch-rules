@@ -3,7 +3,7 @@
   "version": "1.2.0",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=24"
   },
   "bin": {
     "ag-arch-rules": "./dist/bin/init.js"
@@ -24,8 +24,9 @@
   "scripts": {
     "build": "tsup",
     "test": "vitest run",
+    "prepublishOnly": "pnpm test && pnpm build",
     "release": "node scripts/release.js",
-    "ship": "pnpm test && pnpm build && pnpm publish --no-git-checks"
+    "ship": "pnpm publish --no-git-checks"
   },
   "peerDependencies": {
     "vitest": ">=1.0.0"
@@ -40,9 +41,9 @@
   "devDependencies": {
     "@types/madge": "^5.0.3",
     "@types/micromatch": "^4.0.0",
-    "@types/node": "^22.0.0",
+    "@types/node": "^24.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.9.3",
+    "typescript": "^6.0.0",
     "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@10.30.3"
