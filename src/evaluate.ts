@@ -18,6 +18,7 @@ import { noHooksOnPages }            from './frontend/rules/noHooksOnPages.js';
 import { requirePathAlias }          from './frontend/rules/requirePathAlias.js';
 import { requireHookPrefix }         from './frontend/rules/requireHookPrefix.js';
 import { noCrossFeatureImports }     from './frontend/rules/noCrossFeatureImports.js';
+import { requireFeaturePublicEntry } from './frontend/rules/requireFeaturePublicEntry.js';
 
 // Backend Node rules
 import { noEndpointsDependOnEndpoints } from './backend-node/rules/noEndpointsDependOnEndpoints.js';
@@ -60,6 +61,7 @@ const RULES: Record<string, RuleImplementation> = {
   'require-path-alias':                    requirePathAlias,
   'require-hook-prefix':                   requireHookPrefix,
   'no-cross-feature-imports':              noCrossFeatureImports,
+  'require-feature-public-entry':          requireFeaturePublicEntry,
   // Backend Node
   'no-endpoints-depend-on-endpoints':      noEndpointsDependOnEndpoints,
   'no-models-depend-on-endpoints':         noModelsDependOnEndpoints,

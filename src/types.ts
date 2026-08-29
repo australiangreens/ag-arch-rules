@@ -42,6 +42,15 @@ export type NoCrossFeatureImportsOptions = CrossSliceImportOptions & {
   sliceDir?: string;
 };
 
+export type RequireFeaturePublicEntryOptions = BaseRuleOptions & {
+  /** Slice directories to guard. Default: config.sliceDirs ?? ['features']. */
+  sliceDirs?: string[];
+  /** Accepted entry basenames, extension-insensitive. Default: ['index.ts', 'index.tsx']. */
+  entryFiles?: string[];
+  /** Path aliases that resolve to config.root. Default: ['@/']. */
+  pathAliases?: string[];
+};
+
 export type NoMiddlewareDependsOnModelsOptions = BaseRuleOptions & {
   /** Report only dependencies matching these target globs (CWD-relative). */
   forbiddenModelGlobs?: string[];
@@ -83,6 +92,7 @@ export type RulesConfig = {
   'require-path-alias'?:                    RuleConfig;
   'require-hook-prefix'?:                   RuleConfig;
   'no-cross-feature-imports'?:              RuleConfig<NoCrossFeatureImportsOptions>;
+  'require-feature-public-entry'?:          RuleConfig<RequireFeaturePublicEntryOptions>;
 
   // Backend Node rules
   'no-endpoints-depend-on-endpoints'?:      RuleConfig<NoEndpointsDependOnEndpointsOptions>;

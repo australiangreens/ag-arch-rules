@@ -3,7 +3,7 @@ import * as path from 'node:path';
 import { findFiles, matchesAny, toRelative } from '../../utils/glob.js';
 import type { ArchConfig, CrossSliceImportOptions, Violation } from '../../types.js';
 
-const IMPORT_SPECIFIER_RE =
+export const IMPORT_SPECIFIER_RE =
   /(?:import|export)\s+(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]|import\(\s*['"]([^'"]+)['"]\s*\)|require\(\s*['"]([^'"]+)['"]\s*\)/gm;
 
 function featureKey(
@@ -18,7 +18,7 @@ function featureKey(
   return parts.slice(0, depth).join('/');
 }
 
-function resolveToAbsolute(
+export function resolveToAbsolute(
   importPath: string,
   sourceFile: string,
   configRoot: string,
