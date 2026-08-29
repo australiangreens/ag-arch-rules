@@ -41,3 +41,36 @@ describe('checkLayerDependency', () => {
     expect(violations.some(v => v.file.includes('PageDependent'))).toBe(true);
   });
 });
+
+describe('checkLayerDependency — sliceDirs', () => {
+  const SLICES_FIXTURE_ROOT = 'tests/fixtures/frontend-slices/src';
+
+  it('without sliceDirs, an intra-slice layer violation is silently missed', async () => {
+    const config = { root: SLICES_FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };
+    const violations = await checkLayerDependency(config, 'apis', 'components', {});
+    expect(violations).toEqual([]);
+  });
+
+  it('with sliceDirs, the same intra-slice layer violation is caught', async () => {
+    const config = {
+      root: SLICES_FIXTURE_ROOT,
+      mode: 'enforce' as const,
+      rules: {},
+      sliceDirs: ['features'],
+    };
+    const violations = await checkLayerDependency(config, 'apis', 'components', {});
+    expect(violations.some(v => v.file.includes('features/alpha/apis/client'))).toBe(true);
+  });
+
+  it('a slice with no matching layer contributes no violations (allowEmptyTests)', async () => {
+    const config = {
+      root: SLICES_FIXTURE_ROOT,
+      mode: 'enforce' as const,
+      rules: {},
+      sliceDirs: ['features'],
+    };
+    // beta has no apis/ directory at all
+    const violations = await checkLayerDependency(config, 'apis', 'components', {});
+    expect(violations.every(v => !v.file.includes('features/beta'))).toBe(true);
+  });
+});

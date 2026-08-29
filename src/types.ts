@@ -104,6 +104,13 @@ export type ArchConfig = {
   tsConfigPath?: string;
   /** CWD-relative globs identifying test files. Defaults to DEFAULT_TEST_FILE_GLOBS. */
   testFiles?: string[];
+  /**
+   * Directories under root whose immediate subdirectories are treated as
+   * independent slices, each with its own layer structure.
+   * Example: ['features'] → src/features/selfroster is a layer root.
+   * Default: [] (current behaviour, unchanged).
+   */
+  sliceDirs?: string[];
   mode: 'report' | 'enforce';
   rules: RulesConfig;
 };

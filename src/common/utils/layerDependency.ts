@@ -2,6 +2,7 @@ import { projectFiles } from 'archunit';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { matchesAny } from '../../utils/glob.js';
+import { resolveLayerRoots } from './sliceRoots.js';
 import type { ArchConfig, BaseRuleOptions, Violation } from '../../types.js';
 
 function findTsConfig(startDir: string): string | undefined {
@@ -15,19 +16,15 @@ function findTsConfig(startDir: string): string | undefined {
   }
 }
 
-export async function checkLayerDependency(
-  config: ArchConfig,
+async function checkLayerDependencyInRoot(
+  root: string,
   fromLayer: string,
   toLayer: string,
+  tsConfigPath: string | undefined,
+  tsConfigDir: string,
   options: BaseRuleOptions
 ): Promise<Violation[]> {
-  const tsConfigPath = config.tsConfigPath
-    ? path.resolve(config.tsConfigPath)
-    : findTsConfig(config.root);
-
-  const tsConfigDir = tsConfigPath ? path.dirname(tsConfigPath) : process.cwd();
-
-  const rootAbs = path.resolve(config.root);
+  const rootAbs = path.resolve(root);
   const rootRelToTs = path.relative(tsConfigDir, rootAbs).replace(/\\/g, '/');
 
   const fromPattern = rootRelToTs + '/' + fromLayer + '/**';
@@ -56,4 +53,26 @@ export async function checkLayerDependency(
       file: rel,
       message: `imports from ${to}`,
     }));
+}
+
+export async function checkLayerDependency(
+  config: ArchConfig,
+  fromLayer: string,
+  toLayer: string,
+  options: BaseRuleOptions
+): Promise<Violation[]> {
+  const tsConfigPath = config.tsConfigPath
+    ? path.resolve(config.tsConfigPath)
+    : findTsConfig(config.root);
+
+  const tsConfigDir = tsConfigPath ? path.dirname(tsConfigPath) : process.cwd();
+
+  const roots = resolveLayerRoots(config);
+  const results = await Promise.all(
+    roots.map(root =>
+      checkLayerDependencyInRoot(root, fromLayer, toLayer, tsConfigPath, tsConfigDir, options)
+    )
+  );
+
+  return results.flat();
 }

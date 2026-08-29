@@ -34,3 +34,24 @@ describe('requireHookPrefix', () => {
     expect(violations.every(v => !v.file.includes('badHook'))).toBe(true);
   });
 });
+
+describe('requireHookPrefix — sliceDirs', () => {
+  const SLICES_FIXTURE_ROOT = 'tests/fixtures/frontend-slices/src';
+
+  it('without sliceDirs, a hooks/ dir nested in a slice is not checked', async () => {
+    const config = { root: SLICES_FIXTURE_ROOT, mode: 'enforce' as const, rules: {} };
+    const violations = await requireHookPrefix(config, {});
+    expect(violations).toEqual([]);
+  });
+
+  it('with sliceDirs, a hook file inside a slice missing the use prefix is caught', async () => {
+    const config = {
+      root: SLICES_FIXTURE_ROOT,
+      mode: 'enforce' as const,
+      rules: {},
+      sliceDirs: ['features'],
+    };
+    const violations = await requireHookPrefix(config, {});
+    expect(violations.some(v => v.file.includes('features/alpha/hooks/badHook'))).toBe(true);
+  });
+});

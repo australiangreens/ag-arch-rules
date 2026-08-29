@@ -4,6 +4,24 @@ Rules are grouped by applicability. Common rules apply to any project type; fron
 
 ---
 
+## Config: `sliceDirs`
+
+`ArchConfig.sliceDirs` (default: `[]`) names directories under `root` whose immediate subdirectories are treated as independent slices — each one gets its own layer structure checked, in addition to the top-level layout under `root`.
+
+```ts
+defineArchConfig({
+  root: 'src',
+  sliceDirs: ['features'], // src/features/selfroster is a layer root
+  // ...
+})
+```
+
+Without `sliceDirs`, layer rules only see the top-level directories directly under `root` (`src/apis`, `src/components`, ...). Code moved into `src/features/<name>/apis/` is invisible to those rules unless `sliceDirs` includes `'features'` — the rules pass, but check nothing inside the slice.
+
+Rules that respect `sliceDirs`: `no-apis-depend-on-components`, `no-apis-depend-on-pages`, `no-components-depend-on-pages`, `no-hooks-depend-on-pages`, `no-types-depend-on-runtime-layers`, `no-constants-depend-on-runtime-layers`, `require-hook-prefix`.
+
+---
+
 ## Common Rules
 
 These rules are included in both `agFrontendPreset` and `agBackendNodePreset`.
