@@ -15,6 +15,7 @@ export const agFrontendPreset = {
     'errors-extend-ag-error':                'error',
     'require-test-type-suffix':              'warn',
     'require-hook-prefix':                   'warn',
+    'no-cross-feature-imports':              'error',
     'max-file-lines':                        ['warn', { tsx: 400, ts: 300 }],
   } satisfies RulesConfig,
 } as const;

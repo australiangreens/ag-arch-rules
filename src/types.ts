@@ -23,8 +23,8 @@ export type RequireBarrelExportsOptions = BaseRuleOptions & {
   directories?: string[];
 };
 
-export type NoEndpointsDependOnEndpointsOptions = BaseRuleOptions & {
-  /** Number of path segments under endpoints/ used to define a "feature". Default: 1 */
+export type CrossSliceImportOptions = BaseRuleOptions & {
+  /** Number of path segments under the slice directory used to define a "feature". Default: 1 */
   featureRootDepth?: number;
   /** Path aliases that resolve to config.root (for example ['@/', 'src/']). */
   pathAliases?: string[];
@@ -32,6 +32,14 @@ export type NoEndpointsDependOnEndpointsOptions = BaseRuleOptions & {
   allowIntraFeature?: boolean;
   /** CWD-relative target path globs that are always allowed. */
   allowTargetGlobs?: string[];
+};
+
+export type NoEndpointsDependOnEndpointsOptions = CrossSliceImportOptions;
+
+export type NoCrossFeatureImportsOptions = CrossSliceImportOptions & {
+  /** Slice directory to guard, relative to config.root.
+   *  Default: config.sliceDirs?.[0] ?? 'features'. */
+  sliceDir?: string;
 };
 
 export type NoMiddlewareDependsOnModelsOptions = BaseRuleOptions & {
@@ -74,6 +82,7 @@ export type RulesConfig = {
   'no-hooks-depend-on-pages'?:              RuleConfig;
   'require-path-alias'?:                    RuleConfig;
   'require-hook-prefix'?:                   RuleConfig;
+  'no-cross-feature-imports'?:              RuleConfig<NoCrossFeatureImportsOptions>;
 
   // Backend Node rules
   'no-endpoints-depend-on-endpoints'?:      RuleConfig<NoEndpointsDependOnEndpointsOptions>;

@@ -168,6 +168,27 @@ hooks/authHelper.ts   ✗ VIOLATION
 hooks/useAuth.ts      ✓
 ```
 
+### `no-cross-feature-imports`
+
+A file inside one feature slice (e.g. `src/features/selfroster/`) must not import from another feature slice's internals. Each feature should be self-contained; cross-feature imports create coupling that breaks independent testability and obscures a slice's boundary. Shares its implementation with `no-endpoints-depend-on-endpoints` (see below) via `checkCrossSliceImports`.
+
+```ts
+// src/features/booking/components/Widget.tsx — VIOLATION
+import { SomeInternal } from '../../selfroster/components/SomeInternal';
+```
+
+Config options:
+
+```ts
+'no-cross-feature-imports': ['error', {
+  sliceDir: 'features',     // default: config.sliceDirs?.[0] ?? 'features'
+  featureRootDepth: 1,      // default
+  pathAliases: ['@/'],      // alias prefixes resolved from config.root
+  allowIntraFeature: true,  // default
+  allowTargetGlobs: ['src/features/shared/**'],
+}],
+```
+
 ---
 
 ## Node Backend Rules
