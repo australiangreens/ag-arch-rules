@@ -20,4 +20,14 @@ src/endpoints/reports/
   validationSchemas.ts  ✗ VIOLATION — missing
 \`\`\`
 
-**restrict-db-client-to-approved-zones** — only files matching the configured approved globs (default: \`src/models/db/**\`) may import DB client modules. Endpoints must not import the DB client directly.`;
+**restrict-db-client-to-approved-zones** — only files matching the configured approved globs (default: \`src/models/db/**\`) may import DB client modules. Endpoints must not import the DB client directly.
+
+**require-feature-public-entry** — code outside \`src/endpoints/<feature>/\` must import from that feature's \`index.ts\`, not reach past it into its internals. Configured with \`sliceDirs: ['endpoints']\` in this preset.
+
+\`\`\`ts
+// VIOLATION
+import { validate } from '../endpoints/lists/internal/validators';
+
+// Correct
+import { listsRouter } from '../endpoints/lists';
+\`\`\``;

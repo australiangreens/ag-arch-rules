@@ -15,5 +15,6 @@ export const agBackendNodePreset = {
     'no-middleware-depends-on-models':       'warn',
     'require-validation-schema':             'error',
     'restrict-db-client-to-approved-zones':  'error',
+    'require-feature-public-entry':          ['error', { sliceDirs: ['endpoints'] }],
   } satisfies RulesConfig,
 } as const;

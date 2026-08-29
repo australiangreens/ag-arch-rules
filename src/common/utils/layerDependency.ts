@@ -16,14 +16,13 @@ function findTsConfig(startDir: string): string | undefined {
   }
 }
 
-async function checkLayerDependencyInRoot(
+async function runLayerCheckInRoot(
   root: string,
   fromLayer: string,
   toLayer: string,
   tsConfigPath: string | undefined,
-  tsConfigDir: string,
-  options: BaseRuleOptions
-): Promise<Violation[]> {
+  tsConfigDir: string
+): Promise<{ file: string; to: string }[]> {
   const rootAbs = path.resolve(root);
   const rootRelToTs = path.relative(tsConfigDir, rootAbs).replace(/\\/g, '/');
 
@@ -41,26 +40,26 @@ async function checkLayerDependencyInRoot(
 
   return raw
     .map(v => ({
-      rel: path.join(tsConfigDir, v.dependency.sourceLabel).replace(/\\/g, '/'),
-      to:  path.join(tsConfigDir, v.dependency.targetLabel).replace(/\\/g, '/'),
+      file: path.join(tsConfigDir, v.dependency.sourceLabel).replace(/\\/g, '/'),
+      to:   path.join(tsConfigDir, v.dependency.targetLabel).replace(/\\/g, '/'),
     }))
-    .map(({ rel, to }) => ({
-      rel: path.relative(process.cwd(), rel).replace(/\\/g, '/'),
-      to:  path.relative(process.cwd(), to).replace(/\\/g, '/'),
-    }))
-    .filter(({ rel }) => !matchesAny(rel, options.except ?? []))
-    .map(({ rel, to }) => ({
-      file: rel,
-      message: `imports from ${to}`,
+    .map(({ file, to }) => ({
+      file: path.relative(process.cwd(), file).replace(/\\/g, '/'),
+      to:   path.relative(process.cwd(), to).replace(/\\/g, '/'),
     }));
 }
 
-export async function checkLayerDependency(
+/**
+ * Slice-aware layer check, returning raw {file, to} pairs with no
+ * except-filtering or message formatting applied. Callers that need
+ * more than checkLayerDependency's plain "imports from X" message
+ * (e.g. filtering on the target path) should use this directly.
+ */
+export async function checkLayerDependencyRaw(
   config: ArchConfig,
   fromLayer: string,
-  toLayer: string,
-  options: BaseRuleOptions
-): Promise<Violation[]> {
+  toLayer: string
+): Promise<{ file: string; to: string }[]> {
   const tsConfigPath = config.tsConfigPath
     ? path.resolve(config.tsConfigPath)
     : findTsConfig(config.root);
@@ -69,10 +68,24 @@ export async function checkLayerDependency(
 
   const roots = resolveLayerRoots(config);
   const results = await Promise.all(
-    roots.map(root =>
-      checkLayerDependencyInRoot(root, fromLayer, toLayer, tsConfigPath, tsConfigDir, options)
-    )
+    roots.map(root => runLayerCheckInRoot(root, fromLayer, toLayer, tsConfigPath, tsConfigDir))
   );
 
   return results.flat();
+}
+
+export async function checkLayerDependency(
+  config: ArchConfig,
+  fromLayer: string,
+  toLayer: string,
+  options: BaseRuleOptions
+): Promise<Violation[]> {
+  const raw = await checkLayerDependencyRaw(config, fromLayer, toLayer);
+
+  return raw
+    .filter(({ file }) => !matchesAny(file, options.except ?? []))
+    .map(({ file, to }) => ({
+      file,
+      message: `imports from ${to}`,
+    }));
 }

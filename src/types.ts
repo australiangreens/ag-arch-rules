@@ -83,6 +83,7 @@ export type RulesConfig = {
   'errors-extend-ag-error'?:                RuleConfig;
   'require-test-type-suffix'?:              RuleConfig<RequireTestTypeSuffixOptions>;
   'max-file-lines'?:                        RuleConfig<MaxFileLinesOptions>;
+  'require-feature-public-entry'?:          RuleConfig<RequireFeaturePublicEntryOptions>;
 
   // Frontend-only rules
   'no-apis-depend-on-components'?:          RuleConfig;
@@ -92,7 +93,6 @@ export type RulesConfig = {
   'require-path-alias'?:                    RuleConfig;
   'require-hook-prefix'?:                   RuleConfig;
   'no-cross-feature-imports'?:              RuleConfig<NoCrossFeatureImportsOptions>;
-  'require-feature-public-entry'?:          RuleConfig<RequireFeaturePublicEntryOptions>;
 
   // Backend Node rules
   'no-endpoints-depend-on-endpoints'?:      RuleConfig<NoEndpointsDependOnEndpointsOptions>;

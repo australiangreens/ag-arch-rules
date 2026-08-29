@@ -115,6 +115,31 @@ Configure limits via options:
 'max-file-lines': ['warn', { tsx: 500, ts: 400 }],
 ```
 
+### `require-feature-public-entry`
+
+Code outside a feature slice must import from that slice's public entry file (`index.ts`), not reach past it into the slice's internals. This is what makes the entry file actually mean something — without it, a slice's boundary is a naming convention, not an enforced one. On the frontend, complementary to `no-cross-feature-imports` (below): that rule stops one slice importing another; this one stops the rest of the application (or a slice's own root-level barrel) reaching into any slice. On the backend, it plays the same role for `endpoints/<feature>/`.
+
+```ts
+// src/pages/HostPage.tsx — VIOLATION
+import BoothCard from '../features/selfroster/components/BoothCard';
+
+// src/pages/HostPage.tsx — OK
+import { selfrosterModule } from '../features/selfroster/index.js';
+```
+
+Entry-file matching strips extensions before comparing, so a NodeNext-style `.js` specifier (e.g. `'../features/selfroster/index.js'`, resolving to the `.ts` source) is correctly recognised as the public entry — matching this repo's own import convention.
+
+Config options — the default slice directory differs by preset: `agFrontendPreset` relies on `config.sliceDirs ?? ['features']`, `agBackendNodePreset` sets `sliceDirs: ['endpoints']` explicitly.
+
+```ts
+'require-feature-public-entry': ['error', {
+  sliceDirs: ['features'],               // frontend default: config.sliceDirs ?? ['features']
+                                          // backend default (agBackendNodePreset): ['endpoints']
+  entryFiles: ['index.ts', 'index.tsx'], // default
+  pathAliases: ['@/'],                   // alias prefixes resolved from config.root
+}],
+```
+
 ---
 
 ## Frontend Rules
@@ -186,30 +211,6 @@ Config options:
   pathAliases: ['@/'],      // alias prefixes resolved from config.root
   allowIntraFeature: true,  // default
   allowTargetGlobs: ['src/features/shared/**'],
-}],
-```
-
-### `require-feature-public-entry`
-
-Code outside a feature slice must import from that slice's public entry file (`index.ts`), not reach past it into the slice's internals. This is what makes the entry file actually mean something — without it, a slice's boundary is a naming convention, not an enforced one. Complementary to `no-cross-feature-imports`: that rule stops one slice importing another; this one stops the rest of the application (or a slice's own root-level barrel) reaching into any slice.
-
-```ts
-// src/pages/HostPage.tsx — VIOLATION
-import BoothCard from '../features/selfroster/components/BoothCard';
-
-// src/pages/HostPage.tsx — OK
-import { selfrosterModule } from '../features/selfroster/index.js';
-```
-
-Entry-file matching strips extensions before comparing, so a NodeNext-style `.js` specifier (e.g. `'../features/selfroster/index.js'`, resolving to the `.ts` source) is correctly recognised as the public entry — matching this repo's own import convention.
-
-Config options:
-
-```ts
-'require-feature-public-entry': ['error', {
-  sliceDirs: ['features'],           // default: config.sliceDirs ?? ['features']
-  entryFiles: ['index.ts', 'index.tsx'], // default
-  pathAliases: ['@/'],               // alias prefixes resolved from config.root
 }],
 ```
 

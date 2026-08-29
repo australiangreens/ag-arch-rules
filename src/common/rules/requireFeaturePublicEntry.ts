@@ -1,7 +1,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { findFiles, matchesAny, toRelative } from '../../utils/glob.js';
-import { IMPORT_SPECIFIER_RE, resolveToAbsolute } from '../../common/utils/crossSliceImports.js';
+import { IMPORT_SPECIFIER_RE, resolveToAbsolute } from '../utils/crossSliceImports.js';
 import type { ArchConfig, RequireFeaturePublicEntryOptions, Violation } from '../../types.js';
 
 function stripExt(p: string): string {

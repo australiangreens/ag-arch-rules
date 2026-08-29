@@ -24,4 +24,27 @@ import { fetchUser } from '../../apis/userApi';
 import { fetchUser } from '@/apis/userApi';
 \`\`\`
 
-**require-hook-prefix** — custom hook files in \`src/hooks/\` must start with \`use\` (e.g. \`useUser.ts\`). This matches the React hooks naming convention.`;
+**require-hook-prefix** — custom hook files in \`src/hooks/\` must start with \`use\` (e.g. \`useUser.ts\`). This matches the React hooks naming convention.
+
+## Feature Slices
+
+If this project organises code into vertical feature modules (e.g. \`src/features/selfroster/\` owning its own \`apis/\`, \`components/\`, \`pages/\`) instead of — or alongside — the horizontal layers above, configure \`sliceDirs: ['features']\` in \`archConfig\`. This makes the layer rules above run *within* each slice too, and enables two more rules:
+
+**no-cross-feature-imports** — a file inside one feature slice must not import from another feature slice's internals. Each feature should be self-contained.
+
+\`\`\`tsx
+// VIOLATION — src/features/booking/components/Widget.tsx
+import { SomeInternal } from '../../selfroster/components/SomeInternal';
+\`\`\`
+
+**require-feature-public-entry** — code outside a feature slice must import from that slice's \`index.ts\`, not reach past it into the slice's internals.
+
+\`\`\`tsx
+// VIOLATION — src/pages/HostPage.tsx
+import BoothCard from '../features/selfroster/components/BoothCard';
+
+// Correct
+import { selfrosterModule } from '../features/selfroster';
+\`\`\`
+
+Without \`sliceDirs\` configured, both rules default to guarding \`features/\` anyway, but the layer rules above stay blind to code inside it — set \`sliceDirs\` for full coverage.`;

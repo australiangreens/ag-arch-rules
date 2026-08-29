@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { requireFeaturePublicEntry } from '../../../src/frontend/rules/requireFeaturePublicEntry.js';
+import { requireFeaturePublicEntry } from '../../../src/common/rules/requireFeaturePublicEntry.js';
 
 const FIXTURE_ROOT = 'tests/fixtures/frontend-slices/src';
 
@@ -47,5 +47,34 @@ describe('requireFeaturePublicEntry', () => {
       except: [`${FIXTURE_ROOT}/pages/HostPage.tsx`],
     });
     expect(violations.every(v => !v.file.includes('pages/HostPage'))).toBe(true);
+  });
+});
+
+describe('requireFeaturePublicEntry — backend (endpoints/ as sliceDir)', () => {
+  const BACKEND_FIXTURE_ROOT = 'tests/fixtures/backend-rules/src';
+  const backendConfig = {
+    root: BACKEND_FIXTURE_ROOT,
+    tsConfigPath: 'tests/fixtures/backend-rules/tsconfig.json',
+    mode: 'enforce' as const,
+    rules: {},
+  };
+
+  it('flags a deep import from outside endpoints/ into a feature', async () => {
+    const violations = await requireFeaturePublicEntry(backendConfig, {
+      sliceDirs: ['endpoints'],
+    });
+    expect(violations.some(v => v.file.includes('lib/deepImporter'))).toBe(true);
+  });
+
+  it('does not flag one feature importing another through its entry file', async () => {
+    const violations = await requireFeaturePublicEntry(backendConfig, {
+      sliceDirs: ['endpoints'],
+    });
+    expect(violations.every(v => !v.file.includes('endpoints/feature-a/index'))).toBe(true);
+  });
+
+  it('returns no violations without sliceDirs configured (no top-level "features/" dir on the backend fixture)', async () => {
+    const violations = await requireFeaturePublicEntry(backendConfig, {});
+    expect(violations).toEqual([]);
   });
 });

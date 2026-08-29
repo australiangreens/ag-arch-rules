@@ -9,6 +9,7 @@ import { requireErrorHierarchy }     from './common/rules/requireErrorHierarchy.
 import { errorsExtendAgError }       from './common/rules/errorsExtendAgError.js';
 import { requireTestTypeSuffix }     from './common/rules/requireTestTypeSuffix.js';
 import { maxFileLines }              from './common/rules/maxFileLines.js';
+import { requireFeaturePublicEntry } from './common/rules/requireFeaturePublicEntry.js';
 
 // Frontend rules
 import { noApisOnComponents }        from './frontend/rules/noApisOnComponents.js';
@@ -18,7 +19,6 @@ import { noHooksOnPages }            from './frontend/rules/noHooksOnPages.js';
 import { requirePathAlias }          from './frontend/rules/requirePathAlias.js';
 import { requireHookPrefix }         from './frontend/rules/requireHookPrefix.js';
 import { noCrossFeatureImports }     from './frontend/rules/noCrossFeatureImports.js';
-import { requireFeaturePublicEntry } from './frontend/rules/requireFeaturePublicEntry.js';
 
 // Backend Node rules
 import { noEndpointsDependOnEndpoints } from './backend-node/rules/noEndpointsDependOnEndpoints.js';
