@@ -20,6 +20,8 @@ Without `sliceDirs`, layer rules only see the top-level directories directly und
 
 Rules that respect `sliceDirs`: `no-apis-depend-on-components`, `no-apis-depend-on-pages`, `no-components-depend-on-pages`, `no-hooks-depend-on-pages`, `no-types-depend-on-runtime-layers`, `no-constants-depend-on-runtime-layers`, `require-hook-prefix`.
 
+Convention: only the entry file (`index.ts`) belongs directly under a slice directory (e.g. `src/features/index.ts`). Anything else goes inside a specific slice (`src/features/<name>/`) or one of the existing top-level layers (`src/components/`, `src/hooks/`, `src/lib/`, ...) — `no-cross-feature-imports` and `require-feature-public-entry` don't check files sitting directly at the slice-dir root, so that's an unenforced gap, not a sanctioned place for shared code.
+
 ---
 
 ## Common Rules

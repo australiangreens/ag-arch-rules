@@ -47,4 +47,6 @@ import BoothCard from '../features/selfroster/components/BoothCard';
 import { selfrosterModule } from '../features/selfroster';
 \`\`\`
 
-Without \`sliceDirs\` configured, both rules default to guarding \`features/\` anyway, but the layer rules above stay blind to code inside it — set \`sliceDirs\` for full coverage.`;
+Without \`sliceDirs\` configured, both rules default to guarding \`features/\` anyway, but the layer rules above stay blind to code inside it — set \`sliceDirs\` for full coverage.
+
+Convention: only \`index.ts\` belongs directly under \`src/features/\`. Anything else goes inside a specific slice (\`src/features/<name>/\`) or one of the existing top-level layers — files sitting directly at \`src/features/\` root aren't checked by either rule above, so that's an unenforced gap, not a sanctioned place for shared code.`;
