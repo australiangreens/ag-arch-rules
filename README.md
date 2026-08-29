@@ -6,6 +6,14 @@ The package encodes agreed conventions around layer dependencies, project struct
 
 ## Installation
 
+With pnpm:
+
+```sh
+pnpm add -D @australiangreens/ag-arch-rules
+```
+
+With npm:
+
 ```sh
 npm install --save-dev @australiangreens/ag-arch-rules
 ```
@@ -223,6 +231,16 @@ See [docs/RULES.md](docs/RULES.md) for a description of each rule with examples.
 
 ## Requirements
 
-- Node.js 18+
+- Node.js 24+
 - Vitest 1.0+ (peer dependency)
 - TypeScript project with a `tsconfig.json`
+
+## Releasing
+
+```sh
+nvm use   # Node 24 required
+pnpm release patch   # or minor | major
+pnpm ship
+```
+
+`prepublishOnly` runs tests and build before publish.
