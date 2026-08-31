@@ -235,10 +235,17 @@ See [docs/RULES.md](docs/RULES.md) for a description of each rule with examples.
 - Vitest 1.0+ (peer dependency)
 - TypeScript project with a `tsconfig.json`
 
+## Development setup
+
+Install [mise](https://mise.jdx.dev/), then install the project versions:
+
+```sh
+mise install
+```
+
 ## Releasing
 
 ```sh
-nvm use   # Node 24 required
 pnpm release patch   # or minor | major
 pnpm ship
 ```
